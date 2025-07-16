@@ -50,7 +50,19 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxb1fd5d0cf98a515a",
+        "permission" : {
+            "scope.writePhotosAlbum" : {
+                "desc" : "需要您的授权以保存图片到相册"
+            },
+            "scope.userFuzzyLocation" : {
+                "desc" : "你的位置信息将用于获取当前城市"
+            },
+            "scope.subscribeMessage" : {
+                "desc" : "需要获取订阅消息权限"
+            }
+        },
+        "requiredPrivateInfos" : [ "getFuzzyLocation", "chooseLocation" ],
         "setting" : {
             "urlCheck" : false
         },

@@ -5,7 +5,43 @@
 			"style": {
 				"navigationBarTitleText": "uni-app"
 			}
-		}
+		},
+    {
+      "path": "pages/mine/index",
+      "style": { "navigationBarTitleText": "我的", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/wallet/index",
+      "style": { "navigationBarTitleText": "我的钱包", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/wallet/add-bankcard",
+      "style": { "navigationBarTitleText": "添加银行卡", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/favorite/index",
+      "style": { "navigationBarTitleText": "我的收藏", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/message/index",
+      "style": { "navigationBarTitleText": "消息中心", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/service/index",
+      "style": { "navigationBarTitleText": "联系客服", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/settings/index",
+      "style": { "navigationBarTitleText": "设置", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/data/index",
+      "style": { "navigationBarTitleText": "数据", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/scan/index",
+      "style": { "navigationBarTitleText": "扫一扫", "navigationStyle": "custom" }
+    }
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
