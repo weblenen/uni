@@ -1,8 +1,5 @@
 <template>
-  <view v-if="show" class="login-modal-mask">
     <view class="login-modal-content">
-      <view class="login-modal-bar"></view>
-      <image class="login-modal-close" src="https://miaoduo.fbcontent.cn/private/resource/image/197f3a2b6f9bbd0-3e0222b3-3317-477c-a245-d814805c29cc.svg" @click="close" />
       <image class="login-modal-avatar-img" src="https://miaoduo.fbcontent.cn/private/resource/image/197bf76b14a4530-bde7d7a2-af0b-495d-9fd3-9c413b525ac4.png" mode="aspectFill" />
       <view class="login-modal-title">授权登录/注册</view>
       <view class="login-modal-protocol-row" @click="checkboxChange">
@@ -25,11 +22,10 @@
       </button>
       <view class="login-modal-cancel" @click="close">暂不登录</view>
     </view>
-  </view>
 </template>
 
 <script>
-import {get ,post} from '../utils/request'
+import {get ,post} from '@/utils/request'
 
 export default {
   name: 'LoginRegisterModal',
@@ -112,23 +108,14 @@ export default {
   justify-content: center;
 }
 .login-modal-content {
-  width: 100vw;
-  background: #fff;
-  border-top-left-radius: 48rpx;
-  border-top-right-radius: 48rpx;
-  box-shadow: 0px 10rpx 30rpx 0 rgba(0,0,0,0.10);
-  padding-bottom: 40rpx;
-  animation: slideUp 0.3s cubic-bezier(.25,.8,.25,1);
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  padding-left: 64rpx;
-  padding-right: 64rpx;
-  padding-top: 24rpx;
+  width: 100%;
+  /* 去掉弹窗圆角、背景、动画、padding、position、overflow-y 等 */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* 可选：去掉左右内边距，保留顶部间距 */
+  padding-top: 24rpx;
 }
 @keyframes slideUp {
   from { transform: translateY(100%); }
@@ -208,8 +195,11 @@ export default {
   margin: 32rpx auto 0 auto;
   padding: 0rpx 0;
   width: 550rpx;
-  border: 0;
 }
+
+.login-modal-btn::after {
+      border: none;
+ }
 .login-modal-btn-disabled {
   background: #B2F1E2;
   color: #fff;

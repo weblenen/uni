@@ -94,67 +94,49 @@
       </view>
     </view>
 
-    <LoginRegisterModal :show="loginModalShow" @close="closeLoginModal" @login="login" />
+    <BaseModal v-model="baseModalShow" @close="closeBaseModal">
+    <LoginRegisterModal  />
+    </BaseModal>
   </view>
 </template>
 
-<script>
-import StatusBarGap from '@/components/StatusBarGap.vue';
-import LoginRegisterModal from '@/components/LoginRegisterModal.vue';
-export default {
-  name: 'MinePage',
-  components: { StatusBarGap, LoginRegisterModal },
-  data() {
-    return {
-      isLogin: false, // 这里根据实际登录状态赋值
-      // userInfo: {
-      //   avatar: 'https://miaoduo.fbcontent.cn/private/resource/image/197cfe00e07481c-ca6873b5-2309-4347-8334-aa51c5e11fe4.jpeg',
-      //   name: '张三',
-      //   role: '推客',
-      //   phone: '138****4567',
-      //   id: '1234567'
-      // },
-      loginModalShow: false
-    };
-  },
-  computed: {
-  userInfo() {
-    console.log(this.$store.state.userInfo,'this.$store.state.userInfo');
-    
-    return this.$store.state.userInfo
-  }
-  },
-  methods: {
-    goWallet() {
-      uni.navigateTo({ url: '/pages/wallet/index' });
-    },
-    goFavorite() {
-      uni.navigateTo({ url: '/pages/favorite/index' });
-    },
-    goMessage() {
-      uni.navigateTo({ url: '/pages/message/index' });
-    },
-    goService() {
-      uni.navigateTo({ url: '/pages/service/index' });
-    },
-    goSetting() {
-      uni.navigateTo({ url: '/pages/setting/index' });
-    },
-    goData() {
-      uni.navigateTo({ url: '/pages/data/index' });
-    },
-    goLogin() {
-      this.loginModalShow = true;
-    },
-    closeLoginModal() {
-      this.loginModalShow = false;
-    },
-    login() {
-      this.closeLoginModal()
-      this.isLogin = true
-      this.userInfo = uni.getStorageSync('userInfo')
-    }
-  }
+<script setup>
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue'
+import LoginRegisterModal from '@/components/LoginRegisterModal/LoginRegisterModal.vue'
+import BaseModal from '@/components/BaseModal/BaseModal.vue'
+
+const store = useStore()
+
+const isLogin = ref(false)
+const baseModalShow = ref(false)
+
+const userInfo = computed(() => store.state.userInfo)
+
+function goWallet() {
+  uni.navigateTo({ url: '/pages/mine/wallet/index' })
+}
+function goFavorite() {
+  uni.navigateTo({ url: '/pages/mine/favorite/index' })
+}
+function goMessage() {
+  uni.navigateTo({ url: '/pages/mine/message/index' })
+}
+function goService() {
+  uni.navigateTo({ url: '/pages/mine/service/index' })
+}
+function goSetting() {
+  uni.navigateTo({ url: '/pages/mine/settings/index' })
+}
+function goData() {
+  uni.navigateTo({ url: '/pages/mine/data/index' })
+}
+function goLogin() {
+  baseModalShow.value = true
+}
+function closeBaseModal() {
+  baseModalShow.value = false
 }
 </script>
 
