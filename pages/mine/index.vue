@@ -5,19 +5,19 @@
     <!-- 用户信息卡片 -->
     <view class="user-card">
       <view class="user-card-bar"></view>
-      <template v-if="isLogin">
+      <template v-if="userInfo">
         <view class="user-info-row">
           <view class="avatar-border">
             <image
               class="user-avatar"
-              :src="userInfo.avatar"
+              :src="userInfo.avatarUrl || '../../static/logo.png'"
               mode="aspectFill"
             />
           </view>
           <view class="user-info">
             <view class="user-info-top">
-              <text class="user-name">{{ userInfo.name }}</text>
-              <view class="user-tag"><text>{{ userInfo.role }}</text></view>
+              <text class="user-name">{{ userInfo.nickname }}</text>
+              <view class="user-tag" v-if="userInfo.referrer"><text>推客</text></view>
             </view>
             <text class="user-phone">{{ userInfo.phone }}</text>
             <text class="user-id">ID: {{ userInfo.id }}</text>
@@ -40,8 +40,8 @@
         <text class="wallet-action" @click="goWallet">去提现 &gt;</text>
       </view>
       <view class="wallet-amount-row">
-        <text class="wallet-amount">¥{{ isLogin ? '1,280' : '0' }}</text>
-        <text class="wallet-amount">¥{{ isLogin ? '520' : '0' }}</text>
+        <text class="wallet-amount">¥{{ userInfo ? '1,280' : '0' }}</text>
+        <text class="wallet-amount">¥{{ userInfo ? '520' : '0' }}</text>
       </view>
       <view class="wallet-label-row">
         <text class="wallet-label">账户余额</text>
@@ -94,25 +94,22 @@
       </view>
     </view>
 
-    <BaseModal v-model="baseModalShow" @close="closeBaseModal">
-    <LoginRegisterModal  />
+    <BaseModal v-model="baseModalShow"  @close="closeBaseModal">
+    <LoginRegisterModal  @close="closeBaseModal"/>
     </BaseModal>
   </view>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useStore } from 'vuex'
+import { computed } from 'vue'
+import { useUserStore } from '@/store/user'
 import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue'
 import LoginRegisterModal from '@/components/LoginRegisterModal/LoginRegisterModal.vue'
 import BaseModal from '@/components/BaseModal/BaseModal.vue'
 
-const store = useStore()
+const userStore = useUserStore()
 
-const isLogin = ref(false)
-const baseModalShow = ref(false)
-
-const userInfo = computed(() => store.state.userInfo)
+const userInfo = computed(() => userStore.userInfo)
 
 function goWallet() {
   uni.navigateTo({ url: '/pages/mine/wallet/index' })
@@ -136,6 +133,8 @@ function goLogin() {
   baseModalShow.value = true
 }
 function closeBaseModal() {
+  console.log('关闭弹框');
+  
   baseModalShow.value = false
 }
 </script>
@@ -186,7 +185,7 @@ function closeBaseModal() {
 .user-info-row {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: center;
   gap: 32rpx;
   padding: 0 40rpx;
 }
@@ -198,18 +197,21 @@ function closeBaseModal() {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  width: 160rpx;
+  height: 160rpx;
 }
 .user-avatar {
   width: 152rpx;
   height: 152rpx;
   border-radius: 9999rpx;
   background-size: cover;
+  display: block;
 }
 .user-info {
   margin-top: 4rpx;
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 16rpx;
 }
 .user-info-top {
   display: flex;
