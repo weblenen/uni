@@ -1,10 +1,7 @@
 <template>
-  <view v-if="show" class="bank-modal-mask" @click.self="close">
     <view class="bank-modal-content">
-      <view class="bank-modal-bar"></view>
       <view class="bank-modal-header">
         <text class="bank-modal-title">选择银行卡</text>
-        <image class="bank-modal-close" src="https://miaoduo.fbcontent.cn/private/resource/image/197f3a2b6f9bbd0-3e0222b3-3317-477c-a245-d814805c29cc.svg" @click="close" />
       </view>
       <view v-for="(card, idx) in cards" :key="card.id" class="bank-modal-item" @click="select(card)">
         <view class="bank-modal-item-left">
@@ -25,7 +22,6 @@
         添加银行卡
       </view>
     </view>
-  </view>
 </template>
 
 <script>
@@ -52,30 +48,13 @@ export default {
 </script>
 
 <style scoped>
-.bank-modal-mask {
-  position: fixed;
-  left: 0; right: 0; bottom: 0; top: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 1000;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
 .bank-modal-content {
   width: 100vw;
-  background: #fff;
   border-top-left-radius: 32rpx;
   border-top-right-radius: 32rpx;
-  box-shadow: 0px 4rpx 24rpx 0 rgba(0,0,0,0.10);
   padding-bottom: 40rpx;
-  animation: slideUp 0.3s cubic-bezier(.25,.8,.25,1);
-  max-height: 80vh;
-  overflow-y: auto;
 }
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
+
 .bank-modal-bar {
   width: 80rpx;
   height: 8rpx;
