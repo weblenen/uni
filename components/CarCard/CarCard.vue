@@ -38,111 +38,113 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue';
 import { post } from '@/utils/request';
-export default {
-  name: 'CarCard',
-  props: {
-    tag: String,
-    img: String,
-    title: String,
-    price: String,
-    subsidy: [String, Number],
-    subsidy_amount: [String, Number],
-    receivedCount: [String, Number],
-    arrowIcon: {
-      type: String,
-      default: 'https://miaoduo.fbcontent.cn/private/resource/image/197e901a210500a-d82fcf18-b9ad-41e1-a30c-4ed09d697a7b.svg'
-    },
-    bottomIcon: {
-      type: String,
-      default: 'https://miaoduo.fbcontent.cn/private/resource/image/197e901a2116c2c-6cf21c67-2abd-4313-91f4-0fcb58381dcd.svg'
-    },
-    power_type: {
-      type: Array,
-      default: () => []
-    },
-    userId: {
-      type: [String, Number],
-      default: ''
-    },
-    vehicleId: {
-      type: [String, Number],
-      default: ''
-    }
+import { useUserStore } from '@/store/user';
+
+const props = defineProps({
+  tag: String,
+  img: String,
+  title: String,
+  price: String,
+  subsidy: [String, Number],
+  subsidy_amount: [String, Number],
+  receivedCount: [String, Number],
+  arrowIcon: {
+    type: String,
+    default: 'https://miaoduo.fbcontent.cn/private/resource/image/197e901a210500a-d82fcf18-b9ad-41e1-a30c-4ed09d697a7b.svg'
   },
-  data() {
-    return {
-      energyTypes: [
-        {id: -1, name: '全部'},
-        {id: 0, name: '油车'},
-        {id: 1, name: '电车'},
-        {id: 2, name: '油电混动'}
-      ],
-      isFavorite: false,
-      favoriteId: ''
-    }
+  bottomIcon: {
+    type: String,
+    default: 'https://miaoduo.fbcontent.cn/private/resource/image/197e901a2116c2c-6cf21c67-2abd-4313-91f4-0fcb58381dcd.svg'
   },
-  mounted() {
-    this.fetchFavoriteStatus();
+  power_type: {
+    type: Array,
+    default: () => []
   },
-  methods: {
-    getEnergyTypeNameById(id) {
-      const type = this.energyTypes.find(item => item.id === id);
-      return type ? type.name : '';
-    },
-    async fetchFavoriteStatus() {
-      if (!this.userId || !this.vehicleId) return;
-      try {
-        const response = await post('/api/favorites/getList', {
-          user_id: this.userId,
-          type: 'vehicle'
-        });
-        const fav = (response.data || []).find(item => item.item_id == this.vehicleId);
-        this.isFavorite = !!fav;
-        this.favoriteId = fav ? fav.id : '';
-      } catch (e) {
-        this.isFavorite = false;
-        this.favoriteId = '';
-      }
-    },
-    async handleFavorite() {
-      if (!this.userId || !this.vehicleId) {
-        uni.showToast({ title: '请先登录', icon: 'none' });
-        return;
-      }
-      if (this.isFavorite) {
-        await this.cancelFavorite();
-      } else {
-        await this.addFavorite();
-      }
-    },
-    async addFavorite() {
-      const response = await post('/api/favorites', {
-        user_id: this.userId,
-        item_id: this.vehicleId,
-        type: 'vehicle'
-      });
-      if (response.code === 0) {
-        uni.showToast({ title: '收藏成功', icon: 'success' });
-        this.fetchFavoriteStatus();
-      } else {
-        uni.showToast({ title: response.message || '收藏失败', icon: 'none' });
-      }
-    },
-    async cancelFavorite() {
-      const response = await post('/api/favorites/del', {
-        id: this.favoriteId
-      });
-      if (response.code === 0) {
-        uni.showToast({ title: '取消收藏', icon: 'success' });
-        this.fetchFavoriteStatus();
-      } else {
-        uni.showToast({ title: response.message || '取消失败', icon: 'none' });
-      }
-    }
+  vehicleId: {
+    type: [String, Number],
+    default: ''
+  }
+});
+
+const emit = defineEmits(['click']);
+
+const energyTypes = [
+  { id: -1, name: '全部' },
+  { id: 0, name: '油车' },
+  { id: 1, name: '电车' },
+  { id: 2, name: '油电混动' }
+];
+
+const isFavorite = ref(false);
+const favoriteId = ref('');
+const userStore = useUserStore();
+const userId = computed(() => userStore.userInfo?.id || '');
+
+function getEnergyTypeNameById(id) {
+  const type = energyTypes.find(item => item.id === id);
+  return type ? type.name : '';
+}
+
+async function fetchFavoriteStatus() {
+  if (!userId.value || !props.vehicleId) return;
+  try {
+    const response = await post('/api/favorites/getList', {
+      user_id: userId.value,
+      type: 'vehicle'
+    });
+    const fav = (response.data || []).find(item => item.item_id == props.vehicleId);
+    isFavorite.value = !!fav;
+    favoriteId.value = fav ? fav.id : '';
+  } catch (e) {
+    isFavorite.value = false;
+    favoriteId.value = '';
   }
 }
+
+async function handleFavorite() {
+  if (!userId.value || !props.vehicleId) {
+    uni.showToast({ title: '请先登录', icon: 'none' });
+    return;
+  }
+  if (isFavorite.value) {
+    await cancelFavorite();
+  } else {
+    await addFavorite();
+  }
+}
+
+async function addFavorite() {
+  const response = await post('/api/favorites', {
+    user_id: userId.value,
+    item_id: props.vehicleId,
+    type: 'vehicle'
+  });
+  if (response.code === 0) {
+    uni.showToast({ title: '收藏成功', icon: 'success' });
+    fetchFavoriteStatus();
+  } else {
+    uni.showToast({ title: response.message || '收藏失败', icon: 'none' });
+  }
+}
+
+async function cancelFavorite() {
+  const response = await post('/api/favorites/del', {
+    id: favoriteId.value
+  });
+  if (response.code === 0) {
+    uni.showToast({ title: '取消收藏', icon: 'success' });
+    fetchFavoriteStatus();
+  } else {
+    uni.showToast({ title: response.message || '取消失败', icon: 'none' });
+  }
+}
+
+onMounted(() => {
+  fetchFavoriteStatus();
+});
 </script>
 
 <style scoped>
