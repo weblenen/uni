@@ -14,9 +14,14 @@
           <text class="setting-list-label">隐私协议</text>
           <image class="setting-list-arrow" src="https://miaoduo.fbcontent.cn/private/resource/image/197ede68443a9a2-044257c8-7ed8-4b2d-ba8c-c2b9b95b9955.svg" mode="aspectFit" />
         </view>
+        <view class="setting-list-item" @click="goFeedback">
+          <image class="setting-list-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197ede684454565-b785cba9-629f-49d7-aad5-91a7e063d5d9.svg" mode="aspectFit" />
+          <text class="setting-list-label">意见反馈</text>
+          <image class="setting-list-arrow" src="https://miaoduo.fbcontent.cn/private/resource/image/197ede68443a9a2-044257c8-7ed8-4b2d-ba8c-c2b9b95b9955.svg" mode="aspectFit" />
+        </view>
       </view>
       <!-- 第二组：意见反馈、注销账号 -->
-      <view class="setting-card">
+      <!-- <view class="setting-card">
         <view class="setting-list-item" @click="goFeedback">
           <image class="setting-list-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197ede684454565-b785cba9-629f-49d7-aad5-91a7e063d5d9.svg" mode="aspectFit" />
           <text class="setting-list-label">意见反馈</text>
@@ -27,7 +32,7 @@
           <text class="setting-list-label logout">注销账号</text>
           <image class="setting-list-arrow" src="https://miaoduo.fbcontent.cn/private/resource/image/197ede68443a9a2-044257c8-7ed8-4b2d-ba8c-c2b9b95b9955.svg" mode="aspectFit" />
         </view>
-      </view>
+      </view> -->
       <!-- 退出登录按钮 -->
       <view class="setting-logout-btn" @click="goLogout">
         <text class="setting-logout-btn-text">退出登录</text>
@@ -44,8 +49,14 @@
 
 <script>
 import HeaderBar from '@/components/HeaderBar/HeaderBar.vue';
+import { useUserStore } from '@/store/user';
+import { ref } from 'vue';
 export default {
   components: { HeaderBar },
+  setup() {
+    const userStore = useUserStore();
+    return { userStore };
+  },
   methods: {
     goUserAgreement() {
       uni.navigateTo({ url: '/pages/mine/settings/user-agreement/index' });
@@ -60,8 +71,10 @@ export default {
       uni.navigateTo({ url: '/pages/mine/settings/logout-account/index' });
     },
     goLogout() {
-      // TODO: 退出登录逻辑
-      uni.showToast({ title: '退出登录', icon: 'none' });
+      this.userStore.logout();
+      uni.showToast({ title: '已退出登录', icon: 'none' });
+      // 可选：跳转到首页或登录页
+      uni.reLaunch({ url: '/pages/mine/index' });
     }
   }
 }

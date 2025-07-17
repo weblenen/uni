@@ -55,39 +55,37 @@
       <view class="feature-grid">
         <view class="feature-item" @click="goWallet">
           <view class="feature-icon-bg">
-            <image class="feature-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197e8e0b2571480-673312e2-4574-48ea-8fb8-cd1f89c6bbf3.svg" mode="aspectFill" />
+            <image class="feature-icon" src="https://img.xinchebangmai.cn/61ce78ef-3a76-4a7f-bf52-fe600f56b380.png" mode="aspectFill" />
           </view>
           <text class="feature-label">我的钱包</text>
         </view>
         <view class="feature-item" @click="goFavorite">
           <view class="feature-icon-bg">
-            <image class="feature-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197e8e0b25888a1-e89280f7-2397-4885-b090-c728eca75508.svg" mode="aspectFill" />
+            <image class="feature-icon" src="https://img.xinchebangmai.cn/7fe2a67a-1d34-4fde-adc5-f690819102ac.png" mode="aspectFill" />
           </view>
           <text class="feature-label">我的收藏</text>
         </view>
-        <view class="feature-item" @click="goMessage">
+        <view class="feature-item" @click="goSetting">
+          <view class="feature-icon-bg">
+            <image class="feature-icon" src="https://img.xinchebangmai.cn/fcd0d69f-3e38-4c9e-b5b2-7271336417e7.png" mode="aspectFill" />
+          </view>
+          <text class="feature-label">设置</text>
+        </view>
+        <!-- <view class="feature-item" @click="goMessage">
           <view class="feature-icon-bg">
             <image class="feature-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197e8e0b2583c62-689978da-df39-408a-8950-9d4f865f6232.svg" mode="aspectFill" />
           </view>
           <text class="feature-label">消息中心</text>
-        </view>
+        </view> -->
         <view class="feature-item" @click="goService">
           <view class="feature-icon-bg">
-            <image class="feature-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197e8e0b25984f5-5cabc3b2-1ebc-4537-8784-1cfa5a62fe7a.svg" mode="aspectFill" />
+            <image class="feature-icon" src="https://img.xinchebangmai.cn/6ba279b4-e803-4d97-be8c-cf5eb74065ad.png" mode="aspectFill" />
           </view>
           <text class="feature-label">联系客服</text>
         </view>
-      </view>
-      <view class="feature-grid feature-grid-2">
-        <view class="feature-item" @click="goSetting">
-          <view class="feature-icon-bg">
-            <image class="feature-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197e8e0b259fd8c-9b733fd1-0048-45cc-88d8-299709bc20e2.svg" mode="aspectFill" />
-          </view>
-          <text class="feature-label">设置</text>
-        </view>
         <view class="feature-item" @click="goData">
           <view class="feature-icon-bg">
-            <image class="feature-icon" src="https://miaoduo.fbcontent.cn/private/resource/image/197e8e0b25a839a-513bbf01-6259-46ef-9179-9f5c59ed258c.svg" mode="aspectFill" />
+            <image class="feature-icon" src="https://img.xinchebangmai.cn/07fa84ee-b194-4915-b49a-ca561d02bca9.png" mode="aspectFill" />
           </view>
           <text class="feature-label">数据</text>
         </view>
@@ -101,7 +99,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useUserStore } from '@/store/user'
 import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue'
 import LoginRegisterModal from '@/components/LoginRegisterModal/LoginRegisterModal.vue'
@@ -110,6 +108,7 @@ import BaseModal from '@/components/BaseModal/BaseModal.vue'
 const userStore = useUserStore()
 
 const userInfo = computed(() => userStore.userInfo)
+const baseModalShow = ref(false)
 
 function goWallet() {
   uni.navigateTo({ url: '/pages/mine/wallet/index' })
@@ -315,24 +314,20 @@ function closeBaseModal() {
   margin-bottom: 16rpx;
 }
 .feature-grid {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 0;
   margin-bottom: 0;
-}
-.feature-grid-2 {
-  margin-top: 16rpx;
-  width: 50%;
 }
 .feature-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  /* flex: 1; */
   gap: 16rpx;
+  padding-top: 24rpx;
+  padding-bottom: 24rpx;
 }
 .feature-icon-bg {
   background: rgba(0,189,151,0.10);
