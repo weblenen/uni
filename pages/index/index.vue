@@ -81,6 +81,14 @@
         <!-- <image src="/static/cc.png" class="car-empty-img" mode="aspectFit" /> -->
         <text class="car-empty-text">暂无车辆</text>
       </view>
+      <!-- 分页加载提示 -->
+      <view v-if="!showLoading && !loading && hasMore && cars.length > 0" style="text-align:center;padding:32rpx 0;">
+        <text
+          @click="loadMore"
+          style="color:#00BD97;font-size:28rpx;cursor:pointer;"
+        >点击查看更多</text>
+      </view>
+      <view v-if="!showLoading && !hasMore && cars.length > 0" style="text-align:center;color:#9CA3AF;font-size:24rpx;padding:32rpx 0;">没有更多了</view>
     </view>
     <!-- @click="showModal = true" -->
 
@@ -118,6 +126,11 @@ const selectedBrand = ref(0)
 const carInfo = ref({})
 
 const userStore = useUserStore()
+
+const page = ref(1)
+const pageSize = 10
+const hasMore = ref(true)
+const loading = ref(false)
 
 async function fetchInitData() {
   showLoading.value = true;
@@ -169,7 +182,8 @@ async function fetchInitData() {
 
 async function fetchCars() {
   showLoading.value = true;
-  cars.value = [];
+  if (loading.value || !hasMore.value) return;
+  loading.value = true;
   const user_id = userStore.userInfo?.id || '';
   const params = {
     brandCode: brands.value[selectedBrand.value]?.code || '',
@@ -177,6 +191,8 @@ async function fetchCars() {
     price_range: priceRanges.value[selectedPrice.value]?.id || '',
     power: energyTypes.value[selectedEnergy.value]?.id !== -1 ? energyTypes.value[selectedEnergy.value]?.id : undefined,
     user_id // 直接带上
+    ,page: page.value
+    ,pageSize: pageSize
   }
   const queryString = Object.entries(params)
     .filter(([_, v]) => v !== '' && v !== undefined)
@@ -185,11 +201,20 @@ async function fetchCars() {
   const url = queryString ? `/api/v2/car-manage?${queryString}` : '/api/v2/car-manage'
   try {
     const res = await get(url)
-    cars.value = res.data || []
+    const list = res.data || []
+    if (page.value === 1) {
+      cars.value = list
+    } else {
+      cars.value = cars.value.concat(list)
+    }
+    if (list.length < pageSize) {
+      hasMore.value = false
+    }
   } catch (err) {
-    cars.value = []
+    if (page.value === 1) cars.value = []
     uni.showToast({ title: '获取车辆失败', icon: 'none' })
   } finally {
+    loading.value = false;
     showLoading.value = false;
   }
 }
@@ -201,23 +226,38 @@ function onBannerClick(item) {
 }
 function onPriceChange(e) {
   selectedPrice.value = Number(e.detail.value)
+  page.value = 1
+  hasMore.value = true
   fetchCars()
 }
 function onCarTypeChange(e) {
   selectedCarType.value = Number(e.detail.value)
+  page.value = 1
+  hasMore.value = true
   fetchCars()
 }
 function onEnergyChange(e) {
   selectedEnergy.value = Number(e.detail.value)
+  page.value = 1
+  hasMore.value = true
   fetchCars()
 }
 function onBrandChange(idx) {
   selectedBrand.value = idx
+  page.value = 1
+  hasMore.value = true
   fetchCars()
 }
 function onCarClick(car) {
   carInfo.value = car
   showModal.value = true
+}
+
+function loadMore() {
+  if (hasMore.value && !loading.value) {
+    page.value++;
+    fetchCars();
+  }
 }
 
 watch(
@@ -227,6 +267,18 @@ watch(
   },
   { immediate: true, deep: true }
 )
+
+// 监听页面滚动到底部
+if (typeof onReachBottom === 'function') {
+  onReachBottom(() => {
+    if (hasMore.value && !loading.value) {
+      page.value++
+      fetchCars()
+    }
+  })
+}
+// H5兼容（如需）
+// onReachBottom为uni-app内置，H5下可用window.onscroll等实现
 </script>
 
 <style scoped>
