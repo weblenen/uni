@@ -74,14 +74,7 @@
       <CarCard
         v-for="(car, idx) in cars"
         :key="car.vehicle_id || idx"
-        :tag="car.tag"
-        :img="car.img || car.vehicle_image_url"
-        :title="car.title"
-        :price="car.price || ('指导价：' + car.manufacturer_price + '万')"
-        :subsidy="car.subsidy"
-        :subsidy_amount ="car.subsidy_amount "
-        :receivedCount="car.receivedCount"
-        :power_type="car.power_type"
+        :car="car"
         @click="onCarClick(car)"
       />
       <view v-if="!showLoading && cars.length === 0" class="car-empty">
@@ -126,7 +119,7 @@ const carInfo = ref({})
 
 const userStore = useUserStore()
 
-async function fetchInitData(user_id) {
+async function fetchInitData() {
   showLoading.value = true;
   try {
     // 品牌
@@ -162,7 +155,7 @@ async function fetchInitData(user_id) {
     ])
     carTypes.value = [{ id: '', name: '全部' }, ...(typesRes.data || [])];
     priceRanges.value = [{ id: '', range_name: '全部' }, ...(pricesRes.data || [])];
-    await fetchCars(user_id);
+    await fetchCars();
   } catch (error) {
     console.error('fetchbrands:', error);
     uni.showToast({
@@ -174,16 +167,17 @@ async function fetchInitData(user_id) {
   }
 }
 
-async function fetchCars(user_id) {
+async function fetchCars() {
   showLoading.value = true;
   cars.value = [];
+  const user_id = userStore.userInfo?.id || '';
   const params = {
     brandCode: brands.value[selectedBrand.value]?.code || '',
     type: carTypes.value[selectedCarType.value]?.id || '',
     price_range: priceRanges.value[selectedPrice.value]?.id || '',
     power: energyTypes.value[selectedEnergy.value]?.id !== -1 ? energyTypes.value[selectedEnergy.value]?.id : undefined,
+    user_id // 直接带上
   }
-  if (user_id) params.user_id = user_id;
   const queryString = Object.entries(params)
     .filter(([_, v]) => v !== '' && v !== undefined)
     .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
@@ -229,8 +223,7 @@ function onCarClick(car) {
 watch(
   () => userStore.userInfo,
   (newVal, oldVal) => {
-    const user_id = newVal && newVal.id ? newVal.id : ''
-    fetchInitData(user_id)
+    fetchInitData()
   },
   { immediate: true, deep: true }
 )

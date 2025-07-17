@@ -2,28 +2,36 @@
   <view class="car-card-hd" @click="$emit('click')">
     <view class="car-card-hd-top">
       <view style="display: flex; gap: 12rpx;">
-        <view v-for="id in power_type" :key="id" class="car-card-hd-tag">
+        <view v-for="id in car.power_type" :key="id" class="car-card-hd-tag">
           {{ getEnergyTypeNameById(id) }}
         </view>
       </view>
       <image
+        v-if="isFavorite"
         class="car-card-hd-fav"
-        :src="isFavorite ? '/static/favcheck.svg' : '/static/fav.svg'"
+        src="/static/favcheck.svg"
+        mode="aspectFit"
+        @tap.stop="handleFavorite"
+      />
+      <image
+        v-else
+        class="car-card-hd-fav"
+        src="/static/fav.svg"
         mode="aspectFit"
         @tap.stop="handleFavorite"
       />
       <!-- <image class="car-card-hd-arrow" :src="arrowIcon" mode="aspectFill" /> -->
     </view>
     <view class="car-card-hd-main">
-      <image class="car-card-hd-img" :src="img" mode="aspectFill" />
+      <image class="car-card-hd-img" :src="car.img || car.vehicle_image_url" mode="aspectFill" />
       <view class="car-card-hd-info">
-        <view class="car-card-hd-title">{{ title }}</view>
-        <view class="car-card-hd-price">{{ price }}</view>
+        <view class="car-card-hd-title">{{ car.title }}</view>
+        <view class="car-card-hd-price">{{ car.price || ('指导价：' + car.manufacturer_price + '万') }}</view>
         <view class="car-card-hd-desc">
-          <text class="car-card-hd-desc-highlight">送</text>全网最高<text class="car-card-hd-desc-highlight">{{ subsidy || 15000}}</text>元补贴攻略
+          <text class="car-card-hd-desc-highlight">送</text>全网最高<text class="car-card-hd-desc-highlight">{{ car.subsidy || 15000}}</text>元补贴攻略
         </view>
         <view class="car-card-hd-actions">
-          <view class="car-card-hd-coupon">¥{{ parseInt(subsidy_amount) }}</view>
+          <view class="car-card-hd-coupon">¥{{ parseInt(car.subsidy_amount) }}</view>
           <view class="car-card-hd-btn">
             <text class="car-card-hd-btn-main">领取</text>
             <text class="car-card-hd-btn-sub">新车帮买额外补贴</text>
@@ -33,7 +41,7 @@
     </view>
     <view class="car-card-hd-bottom">
       <image class="car-card-hd-bottom-icon" :src="bottomIcon" mode="aspectFill" />
-      <text class="car-card-hd-bottom-text">已有{{ receivedCount  || 1653}}人领取</text>
+      <text class="car-card-hd-bottom-text">已有{{ car.receivedCount  || 1653}}人领取</text>
     </view>
   </view>
 </template>
@@ -44,13 +52,10 @@ import { post } from '@/utils/request';
 import { useUserStore } from '@/store/user';
 
 const props = defineProps({
-  tag: String,
-  img: String,
-  title: String,
-  price: String,
-  subsidy: [String, Number],
-  subsidy_amount: [String, Number],
-  receivedCount: [String, Number],
+  car: {
+    type: Object,
+    required: true
+  },
   arrowIcon: {
     type: String,
     default: 'https://miaoduo.fbcontent.cn/private/resource/image/197e901a210500a-d82fcf18-b9ad-41e1-a30c-4ed09d697a7b.svg'
@@ -58,14 +63,6 @@ const props = defineProps({
   bottomIcon: {
     type: String,
     default: 'https://miaoduo.fbcontent.cn/private/resource/image/197e901a2116c2c-6cf21c67-2abd-4313-91f4-0fcb58381dcd.svg'
-  },
-  power_type: {
-    type: Array,
-    default: () => []
-  },
-  vehicleId: {
-    type: [String, Number],
-    default: ''
   }
 });
 
@@ -78,7 +75,9 @@ const energyTypes = [
   { id: 2, name: '油电混动' }
 ];
 
-const isFavorite = ref(false);
+const isFavorite = ref(props.car.is_favorited); // 本地维护收藏状态
+console.log('isFavorite', isFavorite.value);
+
 const favoriteId = ref('');
 const userStore = useUserStore();
 const userId = computed(() => userStore.userInfo?.id || '');
@@ -88,24 +87,8 @@ function getEnergyTypeNameById(id) {
   return type ? type.name : '';
 }
 
-async function fetchFavoriteStatus() {
-  if (!userId.value || !props.vehicleId) return;
-  try {
-    const response = await post('/api/favorites/getList', {
-      user_id: userId.value,
-      type: 'vehicle'
-    });
-    const fav = (response.data || []).find(item => item.item_id == props.vehicleId);
-    isFavorite.value = !!fav;
-    favoriteId.value = fav ? fav.id : '';
-  } catch (e) {
-    isFavorite.value = false;
-    favoriteId.value = '';
-  }
-}
-
 async function handleFavorite() {
-  if (!userId.value || !props.vehicleId) {
+  if (!userId.value || !props.car.vehicle_id) {
     uni.showToast({ title: '请先登录', icon: 'none' });
     return;
   }
@@ -119,32 +102,22 @@ async function handleFavorite() {
 async function addFavorite() {
   const response = await post('/api/favorites', {
     user_id: userId.value,
-    item_id: props.vehicleId,
+    item_id: props.car.vehicle_id,
     type: 'vehicle'
   });
-  if (response.code === 0) {
-    uni.showToast({ title: '收藏成功', icon: 'success' });
-    fetchFavoriteStatus();
-  } else {
-    uni.showToast({ title: response.message || '收藏失败', icon: 'none' });
-  }
+  isFavorite.value = true; // 本地切换
 }
 
 async function cancelFavorite() {
-  const response = await post('/api/favorites/del', {
-    id: favoriteId.value
+  const response = await post('/api/favorites/delByUser', {
+    user_id: userId.value,
+    item_id: props.car.vehicle_id,
   });
-  if (response.code === 0) {
-    uni.showToast({ title: '取消收藏', icon: 'success' });
-    fetchFavoriteStatus();
-  } else {
-    uni.showToast({ title: response.message || '取消失败', icon: 'none' });
-  }
+  isFavorite.value = false; // 本地切换
+
 }
 
-onMounted(() => {
-  fetchFavoriteStatus();
-});
+// 删除 onMounted(() => { fetchFavoriteStatus(); });
 </script>
 
 <style scoped>
