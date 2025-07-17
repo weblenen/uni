@@ -95,11 +95,18 @@
     <BaseModal v-model="baseModalShow"  @close="closeBaseModal">
     <LoginRegisterModal  @close="closeBaseModal"/>
     </BaseModal>
+
+    <u-tabbar :value="active" @change="onChange" :fixed="true" :safeAreaInsetBottom="true" :activeColor="'#00BD97'" :inactiveColor="'#6B7280'">
+    <u-tabbar-item icon="/static/a.png" text="首页" name="index" />
+    <u-tabbar-item icon="/static/b.png"  text="进度" name="progress" />
+    <u-tabbar-item v-if="userInfo && userInfo.referrer == 1" icon="/static/c.png"  text="推客" name="referrer" />
+    <u-tabbar-item icon="/static/dd.png"  text="我的" name="mine" />
+  </u-tabbar>
   </view>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue'
 import LoginRegisterModal from '@/components/LoginRegisterModal/LoginRegisterModal.vue'
@@ -108,7 +115,20 @@ import BaseModal from '@/components/BaseModal/BaseModal.vue'
 const userStore = useUserStore()
 
 const userInfo = computed(() => userStore.userInfo)
+
 const baseModalShow = ref(false)
+const active = ref('mine')
+
+function onChange(name) {
+  
+  const map = {
+    index: '/pages/index/index',
+    progress: '/pages/progress/index',
+    referrer: '/pages/referrer/index',
+    mine: '/pages/mine/index'
+  }
+  uni.switchTab({ url: map[name] })
+}
 
 function goWallet() {
   uni.navigateTo({ url: '/pages/mine/wallet/index' })

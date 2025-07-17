@@ -128,4 +128,20 @@
   @click="onCarClick(car)" />
 ```
 
---- 
+---
+
+## uView 动态 Tabbar 说明
+
+本项目推荐使用 uView 的 <u-tabbar> 组件实现自定义/动态 tabbar。
+
+**用法示例：**
+```vue
+<u-tabbar :value="active" @change="onChange">
+  <u-tabbar-item icon="home" text="首页" name="index" />
+  <u-tabbar-item icon="list" text="进度" name="progress" />
+  <u-tabbar-item v-if="userInfo && userInfo.referrer == 1" icon="star" text="推客" name="referrer" />
+  <u-tabbar-item icon="account" text="我的" name="mine" />
+</u-tabbar>
+```
+
+**动态控制 tabbar 项显示/隐藏，详见 uView 官方文档：https://www.uviewui.com/components/tabbar.html** 

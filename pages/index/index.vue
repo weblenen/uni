@@ -94,10 +94,16 @@
 
     <!-- <PhoneChangeModal v-model="showModal" :carInfo="carInfo" /> -->
   </view>
+  <u-tabbar :value="active" @change="onChange" :fixed="true" :safeAreaInsetBottom="true" :activeColor="'#00BD97'" :inactiveColor="'#6B7280'">
+    <u-tabbar-item icon="/static/aa.png" text="首页" name="index" />
+    <u-tabbar-item icon="/static/b.png"  text="进度" name="progress" />
+    <u-tabbar-item v-if="userInfo && userInfo.referrer == 1" icon="/static/c.png"  text="推客" name="referrer" />
+    <u-tabbar-item icon="/static/d.png"  text="我的" name="mine" />
+  </u-tabbar>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useUserStore } from '@/store/user'
 import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue'
 import CarCard from '@/components/CarCard/CarCard.vue'
@@ -126,6 +132,18 @@ const selectedBrand = ref(0)
 const carInfo = ref({})
 
 const userStore = useUserStore()
+const userInfo = computed(() => userStore.userInfo)
+const active = ref('index')
+function onChange(name) {
+  
+  const map = {
+    index: '/pages/index/index',
+    progress: '/pages/progress/index',
+    referrer: '/pages/referrer/index',
+    mine: '/pages/mine/index'
+  }
+  uni.switchTab({ url: map[name] })
+}
 
 const page = ref(1)
 const pageSize = 10
@@ -279,6 +297,7 @@ if (typeof onReachBottom === 'function') {
 }
 // H5兼容（如需）
 // onReachBottom为uni-app内置，H5下可用window.onscroll等实现
+
 </script>
 
 <style scoped>
