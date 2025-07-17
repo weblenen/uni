@@ -147,14 +147,31 @@
       </view>
     </view>
   </view>
+  <u-tabbar :value="active" @change="onChange" :fixed="true" :safeAreaInsetBottom="true" :activeColor="'#00BD97'" :inactiveColor="'#6B7280'">
+    <u-tabbar-item icon="/static/a.png" text="首页" name="index" />
+    <u-tabbar-item icon="/static/b.png"  text="进度" name="progress" />
+    <u-tabbar-item v-if="userInfo && userInfo.referrer == 1" icon="/static/cc.png"  text="推客" name="referrer" />
+    <u-tabbar-item icon="/static/d.png"  text="我的" name="mine" />
+  </u-tabbar>
 </template>
 
-<script>
-import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue';
-export default {
-  name: 'TuikePage',
-  components: { StatusBarGap },
-};
+<script setup>
+import { ref, computed } from 'vue'
+import { useUserStore } from '@/store/user'
+import StatusBarGap from '@/components/StatusBarGap/StatusBarGap.vue'
+
+const userStore = useUserStore()
+const userInfo = computed(() => userStore.userInfo)
+const active = ref('referrer')
+function onChange(name) {
+  const map = {
+    index: '/pages/index/index',
+    progress: '/pages/progress/index',
+    referrer: '/pages/referrer/index',
+    mine: '/pages/mine/index'
+  }
+  uni.switchTab({ url: map[name] })
+}
 </script>
 
 <style scoped>
