@@ -41,6 +41,22 @@
     {
       "path": "pages/mine/scan/index",
       "style": { "navigationBarTitleText": "扫一扫", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/settings/user-agreement/index",
+      "style": { "navigationBarTitleText": "用户协议", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/settings/privacy/index",
+      "style": { "navigationBarTitleText": "隐私协议", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/settings/feedback/index",
+      "style": { "navigationBarTitleText": "意见反馈", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/settings/logout-account/index",
+      "style": { "navigationBarTitleText": "注销账号", "navigationStyle": "custom" }
     }
 	],
 	"globalStyle": {
